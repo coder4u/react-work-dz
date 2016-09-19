@@ -1,36 +1,34 @@
-import React, { PropTypes, Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import Comment from './Comment'
+import toggleOpen from '../decorators/toggleOpen'
 
 class CommentList extends Component {
-    state = {
-        isOpen: false
+    static propTypes = {
+        comments: PropTypes.array
     };
 
     render() {
-        const { comments } = this.props;
-        const { isOpen } = this.state;
-		const commentsItems = isOpen ? comments.map((comment) => <li key={comment.id}><Comment comment={comment}/></li>) : null;
-
         return (
             <div>
-				<br />
-                <div onClick={this.handleClick}>{isOpen ? 'Hide' : 'Show'} comments</div>
-				{commentsItems ? <div><br /><div>Comments:</div><br /></div> : null}
-                {commentsItems ? <ul>{commentsItems}</ul> : null}
+                {this.getToggler()}
+                {this.getList()}
             </div>
         )
     }
 
-    handleClick = () => {
-        this.setState({
-            isOpen : !this.state.isOpen
-        })
+    getToggler() {
+        const { isOpen, toggleOpen } = this.props
+        const text = isOpen ? 'hide comments' : 'show comments'
+        return <a href = "#" onClick = {toggleOpen}>{text}</a>
+    }
+
+    getList() {
+        const { isOpen, comments } = this.props
+        if (!isOpen) return null
+        if (!comments || !comments.length) return <h3>No comments yet</h3>
+        const items = comments.map(comment => <li key = {comment.id}><Comment comment = {comment} /></li>)
+        return <ul>{items}</ul>
     }
 }
 
-
-CommentList.propTypes = {
-	comments: PropTypes.array.isRequired
-};
-
-export default CommentList
+export default toggleOpen(CommentList)
